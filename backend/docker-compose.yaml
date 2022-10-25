@@ -1,0 +1,122 @@
+version: '3.7'
+
+services:
+  backend:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/workspace/src
+      - log-data:/workspace/logs
+    ports:
+      - 3000:3000
+    environment:
+      TZ: Asia/Seoul
+    env_file:
+      - ./.env.docker
+    depends_on:
+      - mysql
+    networks:
+      - backend
+
+  filebeat_plain:
+    container_name: filebeat
+    build:
+      context: ./filebeat_plain
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - log-data:/var/log/server
+    environment:
+      TZ: Asia/Seoul
+    depends_on:
+      - backend
+    networks:
+      - backend
+
+  mysql:
+    container_name: mysql
+    image: mysql:latest
+    volumes:
+      - ./mysql/my.cnf:/etc/my.cnf
+      - mysql-data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: backend_db
+      MYSQL_ROOT_PASSWORD: 1234
+      TZ: Asia/Seoul
+    networks:
+      - backend
+
+  redis:
+    container_name: redis
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    environment:
+      TZ: Asia/Seoul
+    networks:
+      - backend
+
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.6
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+      TZ: Asia/Seoul
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    networks:
+      - backend
+
+  # kibana:
+  #   container_name: kibana
+  #   image: docker.elastic.co/kibana/kibana:7.17.6
+  #   ports:
+  #     - 5601:5601
+  #   environment:
+  #     ELASTICSEARCH_URL: http://elasticsearch:9200
+  #     ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+  #     TZ: Asia/Seoul
+  #   depends_on:
+  #     - elasticsearch
+  #   networks:
+  #     - backend
+
+  logstash:
+    container_name: logstash
+    image: docker.elastic.co/logstash/logstash:7.17.6
+    volumes:
+      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./logstash/mysql-connector-java-8.0.28.jar:/usr/share/logstash/mysql-connector-java-8.0.28.jar
+      - ./logstash/template-board.json:/usr/share/logstash/template-board.json
+      - ./logstash/template-product.json:/usr/share/logstash/template-product.json
+    environment:
+      LS_JAVA_OPTS: -Xms256m -Xmx256m
+      TZ: Asia/Seoul
+    mem_limit: 1g
+    depends_on:
+      - elasticsearch
+    networks:
+      - backend
+
+volumes:
+  log-data:
+  mysql-data:
+  elasticsearch-data:
+
+networks:
+  backend:
+    driver: bridge

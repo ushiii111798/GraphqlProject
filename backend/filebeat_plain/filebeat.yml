@@ -1,0 +1,8 @@
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - '/var/log/server/api/*/*.log'
+
+output.logstash:
+  hosts: ['brianhong.duckdns.org:5045']

@@ -1,0 +1,285 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: String!
+  loginId: String!
+  name: String!
+  birth: DateTime
+  sex: String
+  grade: String!
+  pointTotal: Int
+  email: String
+  isAgreedEmail: Boolean!
+  assignedAt: DateTime!
+  updatedAt: DateTime!
+  optoutAt: DateTime
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type ProductCategory {
+  id: String!
+  category: String!
+}
+
+type ProductDiscount {
+  id: String!
+  name: String!
+  price: Int!
+}
+
+type Product {
+  id: String!
+  name: String!
+  price: Int!
+  deliveryPrice: Int!
+  detailText: String!
+  stock: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  productDiscounts: ProductDiscount
+  productCategories: ProductCategory
+}
+
+type BoardList {
+  id: String
+  title: String
+}
+
+type Board {
+  id: String!
+  title: String!
+  content: String!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+  isSecret: Boolean!
+  boardLists: BoardList!
+  users: User!
+  images: [Image!]
+}
+
+type Image {
+  id: String!
+  image: String!
+  thumbnailSmall: String
+  thumbnailMedium: String
+  thumbnailLarge: String
+  isMain: Boolean!
+  createdAt: DateTime!
+}
+
+type Point {
+  id: String!
+  name: String!
+  point: Float!
+  createdAt: DateTime!
+  status: POINT_STATUS_ENUM!
+  user: User!
+}
+
+enum POINT_STATUS_ENUM {
+  CREDIT
+  CANCEL
+  USED
+}
+
+type Payment {
+  id: String!
+  price: Float!
+  priceTotal: Float!
+  status: ORDER_TRANSACTION_STATUS_ENUM!
+  createdAt: DateTime!
+  impUid: String!
+  user: User
+  point: Point
+}
+
+enum ORDER_TRANSACTION_STATUS_ENUM {
+  PAYMENT
+  CANCEL
+  COMPLETE
+}
+
+type Query {
+  """Fetching Board / Permission Needed"""
+  fetchBoard(boardId: String!): Board!
+
+  """Fetching All Boards / Permission Needed"""
+  fetchBoards(search: String!): [Board!]!
+  fetchProduct(productId: String!): Product!
+  fetchProducts(search: String!): [Product!]!
+  fetchProductsWithDeleted: [Product!]!
+  fetchUser(userId: String!): User!
+  fetchLoginUser: User!
+  fetchUsers: [User!]!
+  fetchUsersWithDeleted: [User!]!
+}
+
+type Mutation {
+  login(loginId: String!, loginPass: String!): String!
+  logout: String!
+  restoreAccessToken: String!
+
+  """
+  Board Create, Image should be uploaded bia FileStream / Permission Needed
+  """
+  createBoard(createBoardInput: CreateBoardInput!): Board!
+
+  """
+  Board Create, Image URL must be provided by URL string / Permission Needed
+  """
+  createBoardWithImageURL(createBoardInput: CreateBoardWithImageURLInput!): Board!
+
+  """
+  Board Update, Image should be uploaded directly via FileStream / Permission Needed
+  """
+  updateBoard(boardId: String!, updateBoardInput: UpdateBoardInput!): Board!
+
+  """
+  Board Update, Image URL must be provided by URL string / Permission Needed
+  """
+  updateBoardWithImageURL(boardId: String!, updateBoardInput: UpdateBoardWithImageURLInput!): Board!
+
+  """Image Upload, return Google Storage URL / Permission Needed"""
+  uploadImage(images: [Upload!]!): [String!]!
+
+  """Image Delete, Permanent / Permission Needed"""
+  deleteImage(imageId: String!): Boolean!
+  createPayment(impUid: String!, amount: Float!): Payment!
+  cancelPayment(impUid: String!): Payment!
+  createProductCategory(category: String!): ProductCategory!
+  createProduct(createProductInput: CreateProductInput): Product!
+  createProductWithImageURL(createProductInput: CreateProductWithImageURLInput): Product!
+  updateProduct(productId: String!, updateProductInput: UpdateProductInput!): Product!
+  updateProductWithImageURL(productId: String!, updateProductInput: UpdateProductWithImageURLInput!): Product!
+  deleteProduct(productId: String!): Boolean!
+  restoreProduct(productId: String!): Boolean!
+  hardDeleteProduct(productId: String!): Boolean!
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  updateUserPwd(loginPass: String!): Boolean!
+  deleteUser(userId: String!): Boolean!
+  deleteLoginUser: Boolean!
+  restoreUser(userId: String!): Boolean!
+  hardDeleteUser(userId: String!): Boolean!
+}
+
+input CreateBoardInput {
+  title: String!
+  content: String!
+  isSecret: Boolean!
+  boardLists: String!
+
+  """If isSecret is set to true, password must be provided"""
+  password: String
+  images: [Upload!]
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+input CreateBoardWithImageURLInput {
+  title: String!
+  content: String!
+  isSecret: Boolean!
+  boardLists: String!
+  password: String!
+  images: [String!]
+}
+
+input UpdateBoardInput {
+  title: String
+  content: String
+  isSecret: Boolean
+  boardLists: String
+
+  """If isSecret is set to true, password must be provided"""
+  password: String
+  images: [Upload!]
+}
+
+input UpdateBoardWithImageURLInput {
+  title: String
+  content: String
+  isSecret: Boolean
+  boardLists: String
+  password: String
+  images: [String!]
+}
+
+input CreateProductInput {
+  name: String!
+  price: Int!
+  deliveryPrice: Int = 0
+  maxQ: Int = 10
+  detailText: String!
+  stock: Int!
+  productCategoriesId: String!
+  productDiscountsId: String
+  images: [Upload!]
+}
+
+input CreateProductWithImageURLInput {
+  name: String!
+  price: Int!
+  deliveryPrice: Int = 0
+  maxQ: Int = 10
+  detailText: String!
+  stock: Int!
+  productCategoriesId: String!
+  productDiscountsId: String
+  images: [String!]
+}
+
+input UpdateProductInput {
+  name: String
+  price: Int
+  deliveryPrice: Int = 0
+  maxQ: Int = 10
+  detailText: String
+  stock: Int
+  productCategoriesId: String
+  productDiscountsId: String
+  images: [Upload!]
+}
+
+input UpdateProductWithImageURLInput {
+  name: String
+  price: Int
+  deliveryPrice: Int = 0
+  maxQ: Int = 10
+  detailText: String
+  stock: Int
+  productCategoriesId: String
+  productDiscountsId: String
+  images: [String!]
+}
+
+input CreateUserInput {
+  loginId: String!
+  loginPass: String!
+  name: String!
+  birth: DateTime!
+  sex: String!
+  grade: String!
+  email: String!
+  isAgreedEmail: Boolean!
+}
+
+input UpdateUserInput {
+  loginId: String
+  loginPass: String
+  name: String
+  birth: DateTime
+  sex: String
+  grade: String
+  email: String
+  isAgreedEmail: Boolean
+}

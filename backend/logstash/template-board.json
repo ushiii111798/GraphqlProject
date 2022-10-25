@@ -1,0 +1,87 @@
+{
+  "template": "template_board",
+  "index_patterns": ["*board*"],
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "ngram_analyzer": {
+          "tokenizer": "ngram_tokenizer"
+        }
+      },
+      "tokenizer": {
+        "ngram_tokenizer": {
+          "type": "nGram",
+          "min_gram": "1",
+          "max_gram": "10"
+        }
+      }
+    },
+    "max_ngram_diff": "20"
+  },
+  "mappings": {
+    "properties": {
+      "id": {
+        "type": "text"
+      },
+      "title": {
+        "type": "text",
+        "analyzer": "ngram_analyzer"
+      },
+      "content": {
+        "type": "text"
+      },
+      "createdAt": {
+        "type": "date"
+      },
+      "updatedAt": {
+        "type": "date"
+      },
+      "isSecret": {
+        "type": "integer"
+      },
+      "boardListsId": {
+        "type": "text"
+      },
+      "boardList_title": {
+        "type": "text"
+      },
+      "user": {
+        "properties": {
+          "usersId": {
+            "type": "text"
+          },
+          "loginId": {
+            "type": "text"
+          },
+          "name": {
+            "type": "text"
+          },
+          "birth": {
+            "type": "date"
+          },
+          "sex": {
+            "type": "text"
+          },
+          "grage": {
+            "type": "text"
+          },
+          "pointTotal": {
+            "type": "integer"
+          },
+          "email": {
+            "type": "text"
+          },
+          "isAgreedEamil": {
+            "type": "integer"
+          },
+          "assignedAt": {
+            "type": "date"
+          },
+          "user_updatedAt": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}

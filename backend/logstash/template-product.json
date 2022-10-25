@@ -1,0 +1,60 @@
+{
+  "template": "template_product",
+  "index_patterns": ["*product*"],
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "ngram_analyzer": {
+          "tokenizer": "ngram_tokenizer"
+        }
+      },
+      "tokenizer": {
+        "ngram_tokenizer": {
+          "type": "nGram",
+          "min_gram": "1",
+          "max_gram": "10"
+        }
+      }
+    },
+    "max_ngram_diff": "20"
+  },
+  "mappings": {
+    "properties": {
+      "id": {
+        "type": "text"
+      },
+      "name": {
+        "type": "text",
+        "analyzer": "ngram_analyzer"
+      },
+      "price": {
+        "type": "integer"
+      },
+      "deliveryPrice": {
+        "type": "integer"
+      },
+      "maxQ": {
+        "type": "integer"
+      },
+      "detailText": {
+        "type": "text",
+        "analyzer": "ngram_analyzer"
+      },
+      "stock": {
+        "type": "integer"
+      },
+      "createdAt": {
+        "type": "date"
+      },
+      "updatedAt": {
+        "type": "date"
+      },
+      "category": {
+        "type": "text"
+      },
+      "productCategoriesId": {
+        "type": "text"
+      }
+    }
+  }
+}
